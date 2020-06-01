@@ -257,6 +257,7 @@ case $basic_machine in
 	| ba \
 	| be32 | be64 \
 	| bfin \
+    | bonjour \
 	| c4x | c8051 | clipper \
 	| d10v | d30v | dlx | dsp16xx \
 	| e2k | epiphany \
@@ -380,6 +381,7 @@ case $basic_machine in
 	| ba-* \
 	| be32-* | be64-* \
 	| bfin-* | bs2000-* \
+    | bonjour-* \
 	| c[123]* | c30-* | [cjt]90-* | c4x-* \
 	| c8051-* | clipper-* | craynv-* | cydra-* \
 	| d10v-* | d30v-* | dlx-* \
