@@ -17,7 +17,7 @@
    You should have received a copy of the GNU General Public License
    along with GCC; see the file COPYING3.  If not see
    <http://www.gnu.org/licenses/>.  */
-   
+
 #ifndef GCC_BONJOUR_H
 #define GCC_BONJOUR_H
 
@@ -42,6 +42,14 @@
 #define LIB_SPEC "-( -lc %{msim*:-lsim}%{!msim*:-lnosys} -) \
 %{msim*:%{!T*:-Tsim.ld}} \
 %{!T*:%{!msim*: %{-Telf32bonjour.x}}}"
+
+#define LOCAL_LABEL_PREFIX '.'
+
+/* Make an internal label into a string. */
+#ifndef ASM_GENERATE_INTERNAL_LABEL
+#define ASM_GENERATE_INTERNAL_LABEL(STRING, PREFIX, NUM) \
+    sprintf  (STRING, "*%s%s%u", LOCAL_LABEL_PREFIX, PREFIX, (unsigned int)(NUM))
+#endif
 
 /* Run-time target specification.  */
 #ifndef TARGET_CPU_CPP_BUILTINS
@@ -101,7 +109,7 @@ while (0)
 
 #define FUNCTION_BOUNDARY   BIGGEST_ALIGNMENT
 
-/* Biggest alignment on BONJOURC+ is 32-bit as internal bus is AMBA based 
+/* Biggest alignment on BONJOURC+ is 32-bit as internal bus is AMBA based
    where as BONJOURC is proprietary internal bus architecture.  */
 #define BIGGEST_ALIGNMENT   ((TARGET_BONJOURCP) ? 32 : 16)
 
@@ -177,15 +185,15 @@ while (0)
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,        \
   /* r11 r12 r13 ra  sp.  */                          \
     0,  0,  0,  0,  1                                 \
-  }      
+  }
 
 /* 1 for registers not available across function calls.
    These must include the FIXED_REGISTERS and also any
    registers that can be used without being saved.
    The latter must include the registers where values are returned
    and the register where structure-value addresses are passed.
- 
-   On the BONJOUR, calls clobbers r0-r6 (scratch registers), 
+
+   On the BONJOUR, calls clobbers r0-r6 (scratch registers),
    ra (the return address) and sp (the stack pointer).  */
 #define CALL_USED_REGISTERS                           \
   {                                                   \
@@ -210,14 +218,14 @@ while (0)
    register number @var{regno} (or in several registers starting with that
    one).  On the BONJOUR architecture, all registers can hold all modes,
    except that double precision floats (and double ints) must fall on
-   even-register boundaries.  */ 
+   even-register boundaries.  */
 #define HARD_REGNO_MODE_OK(REGNO, MODE) bonjour_hard_regno_mode_ok (REGNO, MODE)
 
 #define NOTICE_UPDATE_CC(EXP, INSN) \
    notice_update_cc ((EXP))
 
-/* Interrupt functions can only use registers that have already been 
-   saved by the prologue, even if they would normally be call-clobbered 
+/* Interrupt functions can only use registers that have already been
+   saved by the prologue, even if they would normally be call-clobbered
    Check if sizes are same and then check if it is possible to rename.  */
 #define HARD_REGNO_RENAME_OK(SRC, DEST)                 \
   (!bonjour_interrupt_function_p () || (df_regs_ever_live_p (DEST)))
@@ -245,8 +253,33 @@ while (0)
 #define DWARF_FRAME_RETURN_COLUMN	\
   DWARF_FRAME_REGNUM (RETURN_ADDRESS_REGNUM)
 
-#define INCOMING_FRAME_SP_OFFSET		0	
-#define FRAME_POINTER_CFA_OFFSET(FNDECL)	0	
+#define INCOMING_FRAME_SP_OFFSET		0
+#define FRAME_POINTER_CFA_OFFSET(FNDECL)	0
+
+/* Output a common block.  */
+#ifndef ASM_OUTPUT_COMMON
+#define ASM_OUTPUT_COMMON(STREAM, NAME, SIZE, ROUNDED)	\
+  do							\
+    {							\
+      fprintf (STREAM, "\t.comm\t");			\
+      assemble_name (STREAM, NAME);			\
+      asm_fprintf (STREAM, ", %d\t%@ %d\n", 		\
+	           (int)(ROUNDED), (int)(SIZE));	\
+    }							\
+  while (0)
+#endif
+
+/* This says how to output an assembler line
+   to define a local common symbol.  */
+#define ASM_OUTPUT_LOCAL(FILE, NAME, SIZE, ROUNDED)	\
+  ( fputs (".lcomm ", (FILE)),				\
+    assemble_name ((FILE), (NAME)),			\
+    fprintf ((FILE), ",%u\n", (int)(ROUNDED)))
+
+/* Output a gap.  In fact we fill it with nulls.  */
+#undef  ASM_OUTPUT_SKIP
+#define ASM_OUTPUT_SKIP(STREAM, NBYTES) 	\
+  fprintf (STREAM, "\t.space\t%d\n", (int) (NBYTES))
 
 /* A C expression whose value is RTL representing the value of the return
    address for the frame COUNT steps up from the current frame.  */
@@ -293,7 +326,7 @@ enum reg_class
     {0x0000FFFF}  /* ALL_REGS 		: 0 - 15     */  	\
   }
 
-#define TARGET_SMALL_REGISTER_CLASSES_FOR_MODE_P  hook_bool_mode_true 
+#define TARGET_SMALL_REGISTER_CLASSES_FOR_MODE_P  hook_bool_mode_true
 
 #define REGNO_REG_CLASS(REGNO)  bonjour_regno_reg_class (REGNO)
 
@@ -334,8 +367,8 @@ enum reg_class
    The size of MODE in double words for the class LONG_REGS.
 
    The following check assumes if the class is not LONG_REGS, then
-   all (NO_REGS, SHORT_REGS, NOSP_REGS and GENERAL_REGS) other classes are 
-   short.  We may have to check if this can cause any degradation in 
+   all (NO_REGS, SHORT_REGS, NOSP_REGS and GENERAL_REGS) other classes are
+   short.  We may have to check if this can cause any degradation in
    performance.  */
 #define CLASS_MAX_NREGS(CLASS, MODE) \
   (CLASS == LONG_REGS \
@@ -416,7 +449,7 @@ struct cumulative_args
 #define CUMULATIVE_ARGS struct cumulative_args
 #endif
 
-/* On the BONJOUR architecture, Varargs routines should receive their parameters 
+/* On the BONJOUR architecture, Varargs routines should receive their parameters
    on the stack.  */
 
 #define INIT_CUMULATIVE_ARGS(CUM, FNTYPE, LIBNAME, FNDECL, N_NAMED_ARGS) \
@@ -481,14 +514,14 @@ struct cumulative_args
 /* NEAR_PIC for -fpic option.  */
 
 #define NEAR_PIC 1
-                                      
-/* FAR_PIC for -fPIC option.  */                                                                                       
+
+/* FAR_PIC for -fPIC option.  */
 
 #define FAR_PIC  2
 
 #define PIC_OFFSET_TABLE_REGNUM  12
 
-#define LEGITIMATE_PIC_OPERAND_P(X) legitimate_pic_operand_p (X)       
+#define LEGITIMATE_PIC_OPERAND_P(X) legitimate_pic_operand_p (X)
 
 /* Assembler format.  */
 
@@ -541,7 +574,7 @@ struct cumulative_args
 
 /* Output of dispatch tables.  */
 
-/* Revisit. No PC relative case as label expressions are not 
+/* Revisit. No PC relative case as label expressions are not
    properly supported in binutils else we could have done this:
    #define CASE_VECTOR_PC_RELATIVE (optimize_size ? 1 : 0).  */
 #define CASE_VECTOR_PC_RELATIVE 0

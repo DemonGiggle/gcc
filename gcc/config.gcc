@@ -308,7 +308,7 @@ aarch64*-*-*)
 	target_has_targetm_common=yes
 	;;
 bonjour-*-*)
-	cpu_type=i386
+	target_has_targetm_common=no
     tmake_file=bonjour/t-bonjour
 	;;
 alpha*-*-*)
