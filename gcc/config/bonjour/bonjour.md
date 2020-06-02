@@ -24,6 +24,13 @@
 (include "predicates.md")
 (include "constraints.md")
 
+;; Basic instruction
+(define_insn "nop"
+  [(const_int 0)]
+  ""
+  "nop"
+)
+
 (define_insn "movsi"
     [(set (match_operand:SI 0 "register_operand" "=r")
           (match_operand:SI 1 "general_operand" "r"))]
