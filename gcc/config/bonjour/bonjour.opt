@@ -17,35 +17,3 @@
 ; You should have received a copy of the GNU General Public License
 ; along with GCC; see the file COPYING3.  If not see
 ; <http://www.gnu.org/licenses/>.
-
-msim
-Target
--msim   Use simulator runtime.
-
-mbit-ops
-Target Report Mask(BIT_OPS)
-Generate SBIT, CBIT instructions.
-
-mmac
-Target Report Mask(MAC)
-Support multiply accumulate instructions.
-
-mdebug-addr
-Target RejectNegative Var(TARGET_DEBUG_ADDR) Undocumented
-
-mdata-model=
-Target RejectNegative JoinedOrMissing Var(bonjour_data_model)
-Treat data references as near, far or medium. medium is default.
-
-mbonjourc
-Target RejectNegative Mask(BONJOURC)
-Generate code for BONJOURC architecture.
-
-mbonjourcplus
-Target RejectNegative InverseMask(BONJOURC,BONJOURCP)
-Generate code for BONJOURC+ architecture (Default).
-
-mint32
-Target RejectNegative Mask(INT32)
-Treat integers as 32-bit.
-

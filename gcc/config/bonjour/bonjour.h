@@ -59,18 +59,6 @@ do                                         \
     builtin_define ("__CR__");             \
     builtin_define ("__BONJOUR__");           \
     builtin_define ("__BONJOURC__");          \
-    if (TARGET_BONJOURCP)                     \
-      builtin_define ("__BONJOURCP__");       \
-    else                                   \
-      builtin_define ("__BONJOURCSTD__");     \
-    if (BONJOUR_TARGET_DATA_NEAR)             \
-      builtin_define ("__DATA_NEAR__");    \
-    if (BONJOUR_TARGET_DATA_MEDIUM)           \
-      builtin_define ("__DATA_MEDIUM__");  \
-    if (BONJOUR_TARGET_DATA_FAR)              \
-      builtin_define ("__DATA_FAR__");     \
-    if (TARGET_INT32)                      \
-      builtin_define ("__INT32__");        \
   }                                        \
 while (0)
 #endif
@@ -79,15 +67,9 @@ while (0)
    compiling -g.  This guarantees that we can unwind the stack.  */
 #define DWARF2_FRAME_INFO 1
 
-#define PREFERRED_DEBUGGING_TYPE DWARF2_DEBUG
-
 /* Generate .file/.loc directives, so that the assembler generates the
    line table.  */
 #define DWARF2_ASM_LINE_DEBUG_INFO 1
-
-#define BONJOUR_TARGET_DATA_NEAR   bonjour_is_data_model (DM_NEAR)
-#define BONJOUR_TARGET_DATA_MEDIUM bonjour_is_data_model (DM_DEFAULT)
-#define BONJOUR_TARGET_DATA_FAR    bonjour_is_data_model (DM_FAR)
 
 /* Storage layout.  */
 #define BITS_BIG_ENDIAN     0
@@ -111,7 +93,7 @@ while (0)
 
 /* Biggest alignment on BONJOURC+ is 32-bit as internal bus is AMBA based
    where as BONJOURC is proprietary internal bus architecture.  */
-#define BIGGEST_ALIGNMENT   ((TARGET_BONJOURCP) ? 32 : 16)
+#define BIGGEST_ALIGNMENT   32
 
 #define MAX_FIXED_MODE_SIZE 64
 
@@ -132,7 +114,7 @@ while (0)
 #define PCC_BITFIELD_TYPE_MATTERS 1
 
 /* Layout of source language data types.  */
-#define INT_TYPE_SIZE       (TARGET_INT32 ? 32 : 16)
+#define INT_TYPE_SIZE       32
 
 #define SHORT_TYPE_SIZE     16
 
@@ -615,5 +597,8 @@ struct cumulative_args
    BONJOUR contains branch instructions that span whole address space.  */
 #define HAS_LONG_COND_BRANCH    1
 #define HAS_LONG_UNCOND_BRANCH  1
+
+#undef TARGET_FUNCTION_VALUE
+#define TARGET_FUNCTION_VALUE       bonjour_function_value
 
 #endif /* End of GCC_BONJOUR_H.  */

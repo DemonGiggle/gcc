@@ -37,3 +37,10 @@
     "1"
     "mov %0, %1"
 )
+
+(define_insn "jump"
+  [(set (pc) (label_ref (match_operand 0 "" "")))]
+  ""
+  "j\t%0"
+)
+
