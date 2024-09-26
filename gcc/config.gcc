@@ -174,7 +174,7 @@
 #			the --with-sysroot configure option or the
 #			--sysroot command line option is used this
 #			will be relative to the sysroot.
-# target_type_format_char 
+# target_type_format_char
 # 			The default character to be used for formatting
 #			the attribute in a
 #			.type symbol_name, ${t_t_f_c}<property>
@@ -306,6 +306,10 @@ aarch64*-*-*)
 	extra_objs="aarch64-builtins.o aarch-common.o cortex-a57-fma-steering.o"
 	target_gtfiles="\$(srcdir)/config/aarch64/aarch64-builtins.c"
 	target_has_targetm_common=yes
+	;;
+bonjour-*-*)
+	target_has_targetm_common=no
+    tmake_file=bonjour/t-bonjour
 	;;
 alpha*-*-*)
 	cpu_type=alpha
@@ -3077,6 +3081,9 @@ m32c-*-elf*)
 	c_target_objs="m32c-pragma.o"
 	cxx_target_objs="m32c-pragma.o"
  	;;
+bonjour-*-*)
+    tmake_file="${tmake_file} bonjour/t-bonjour "
+ 	;;
 *)
 	echo "*** Configuration ${target} not supported" 1>&2
 	exit 1
@@ -3418,7 +3425,7 @@ if test x$with_cpu = x ; then
          with_cpu=8548
       else
          with_cpu=8540
-      fi       
+      fi
       ;;
     sparc*-*-*)
       case ${target} in
